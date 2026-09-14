@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mehnatkashlar.uz - Kirish va Ro'yxatdan o'tish</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="auth.css" />
+  </head>
+  <body>
+    <div class="auth-shell">
+      <aside class="auth-hero">
+        <a href="index.html" class="brand">
+          Mehnatkashlar<span>.uz</span>
+        </a>
+        <h1>Ishonchli ustalar bilan tezroq bog'laning</h1>
+        <p>
+          Kirish yoki ro'yxatdan o'tish orqali xizmatlarni tez toping, e'lon
+          joylang va buyurtmalaringizni boshqaring.
+        </p>
+        <ul class="hero-points">
+          <li>Haqiqiy sharhlar va tekshirilgan ustalar</li>
+          <li>Viloyat va tuman bo'yicha qulay qidiruv</li>
+          <li>Tezkor aloqa va shaffof narxlar</li>
+        </ul>
+        <div class="hero-stats">
+          <div>
+            <strong>10k+</strong>
+            <span>Mamnun mijozlar</span>
+          </div>
+          <div>
+            <strong>4.8/5</strong>
+            <span>O'rtacha baho</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="auth-card">
+        <div class="card-top">
+          <div class="tabs">
+            <button class="tab active" id="tabLogin" type="button">Kirish</button>
+            <button class="tab" id="tabRegister" type="button">Ro'yxatdan o'tish</button>
+          </div>
+          <a class="back-link" href="index.html">Bosh sahifa</a>
+        </div>
+
+        <div class="session-card hidden" id="sessionCard">
+          <div>
+            <p class="session-title">Siz allaqachon tizimga kirgansiz</p>
+            <p class="session-meta" id="sessionMeta">—</p>
+          </div>
+          <div class="session-actions">
+            <a class="btn-outline" href="index.html">Bosh sahifa</a>
+            <button class="btn-danger" id="logoutBtn" type="button">Chiqish</button>
+          </div>
+        </div>
+
+        <form id="loginForm" class="form">
+          <div class="form-head">
+            <h2>Kirish</h2>
+            <p>Hisobingizga kiring va buyurtmalarni boshqaring.</p>
+          </div>
+          <div class="alert hidden" id="loginAlert" aria-live="polite"></div>
+          <label class="field">
+            Telefon raqam
+            <input type="text" id="loginPhone" placeholder="+998 90 123 45 67" autocomplete="tel" />
+          </label>
+          <label class="field">
+            Parol
+            <input type="password" id="loginPassword" placeholder="****" autocomplete="current-password" />
+          </label>
+          <button class="btn-primary" type="submit">Kirish</button>
+          <p class="switch-text">
+            Hisobingiz yo'qmi?
+            <button type="button" class="link-btn" data-switch="register">Ro'yxatdan o'ting</button>
+          </p>
+        </form>
+
+        <form id="registerForm" class="form hidden">
+          <div class="form-head">
+            <h2>Ro'yxatdan o'tish</h2>
+            <p>Yangi hisob yarating va darhol foydalanishni boshlang.</p>
+          </div>
+          <div class="alert hidden" id="registerAlert" aria-live="polite"></div>
+          <div class="field-row">
+            <label class="field">
+              Ism
+              <input type="text" id="regFirstName" placeholder="Ism" autocomplete="given-name" />
+            </label>
+            <label class="field">
+              Familiya
+              <input type="text" id="regLastName" placeholder="Familiya" autocomplete="family-name" />
+            </label>
+          </div>
+          <label class="field">
+            Telefon
+            <input type="text" id="regPhone" placeholder="+998 90 123 45 67" autocomplete="tel" />
+          </label>
+          <label class="field">
+            Kim sifatida kirasiz?
+            <select id="regRole">
+              <option value="client">Ish beruvchi</option>
+              <option value="provider">Ishchi / Usta</option>
+            </select>
+          </label>
+          <label class="field">
+            Parol
+            <input type="password" id="regPassword" placeholder="Kamida 4 ta belgi" autocomplete="new-password" />
+          </label>
+          <label class="field">
+            Parolni takrorlang
+            <input type="password" id="regPassword2" placeholder="Parolni takrorlang" autocomplete="new-password" />
+          </label>
+          <button class="btn-primary" type="submit">Ro'yxatdan o'tish</button>
+          <p class="switch-text">
+            Hisobingiz bormi?
+            <button type="button" class="link-btn" data-switch="login">Kirish</button>
+          </p>
+        </form>
+      </main>
+    </div>
+
+    <script src="auth.js"></script>
+  </body>
+</html>

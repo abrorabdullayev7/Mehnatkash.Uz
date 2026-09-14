@@ -1,0 +1,347 @@
+﻿<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Mehnatkash.uz — kunlik ish, tez ish topish va ishonchli mardikorlar uchun platforma.">
+  <title>Mehnatkash.uz - Kunlik ish va tezkor ish topish platformasi</title>
+  <!-- <link rel="icon" type="image/png" href="../img/mehnatkashlar-icon.png"> -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <div class="logo-wrapper">
+        <a href="#" class="logo">Mehnatkash<span>.uz</span></a>
+      </div>
+      <div class="nav-links hide-mobile">
+        <a href="#home" id="navHomeLabel">Bosh sahifa</a>
+        <button type="button" class="btn-text" id="navMessagesBtn" style="padding: 0 10px; font-weight: 600;">Xabarlar</button>
+      </div>
+      <div class="nav-actions">
+        <div id="postAdBtnContainer" style="margin-right:8px; display: inline-block;">
+          <a id="showPostAdBtn" class="btn-outline" href="post-job.html" style="margin-right: 4px;">E'lon joylash</a>
+        </div>
+        <div id="authButtonsContainer">
+          <a class="btn-text hide-mobile" id="topProfileBtn" href="auth.html#login">Kirish</a>
+          <a class="btn-primary" id="goRegister" href="auth.html#register">Ro'yxatdan o'tish</a>
+        </div>
+        <div id="userProfileContainer" class="hidden" style="display: flex; gap: 8px; align-items: center;">
+          <button class="btn-text account-btn" id="accountBtn" type="button">
+            <span class="account-avatar" id="headerAvatar">U</span>
+            <span id="headerUserName" style="font-weight: 600;"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section id="home" class="hero">
+    <div class="hero-container container">
+      <div class="hero-content">
+        <h1 id="heroTitle">Ish beruvchi bo‘lib eʼlon joylang va kerakli ishchini toping</h1>
+        <p id="heroDesc">Mehnatkash.uz orqali ish beruvchilar o‘z eʼlonlarini joylashtiradi, ishchilar esa shu yerda tezkor ravishda takliflar bilan bog‘lanadi. Asosiy maqsad — kunlik ishlarni tez, qulay va ishonchli tarzda tashkil etish.</p>
+
+        <div class="search-box glass-panel">
+          <div class="search-inputs">
+            <div class="input-group divider">
+              <span class="search-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280"
+                  stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg></span>
+              <input type="text" id="searchInput" class="clean-select" style="padding-left: 12px; height: 48px;"
+                placeholder="Masalan: mardikor, elektrik, santexnik..." />
+            </div>
+            <div class="input-group">
+              <span class="location-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280"
+                  stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg></span>
+              <select class="clean-select" id="regionSelect" style="padding-left: 12px;">
+                <option value="" disabled selected>Viloyatni tanlang</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <select class="clean-select" id="districtSelect" disabled style="padding-left: 12px;">
+                <option value="" disabled selected>Tumanni tanlang</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-primary search-btn" id="searchBtn">Qidiruv</button>
+        </div>
+      </div>
+      <div class="hero-image-wrapper">
+        <div class="hero-backdrop"></div>
+        <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=600&auto=format&fit=crop"
+          alt="Pro Worker" class="hero-image">
+        <div class="floating-card top-right glass-panel bounce-anim"><span class="star-icon">⭐</span>4.9/5<br>Eng yuqori baholangan</div>
+        <div class="floating-card bottom-left glass-panel bounce-anim-delay">✅ Shaxs tasdiqlangan</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADS SECTION -->
+  <section id="ads" class="section bg-light py-large">
+    <div class="container">
+      <div class="section-header text-center" style="margin-bottom: 24px;">
+        <h2>Yangi e'lonlar</h2>
+        <p>O'zingizning ish e'loningizni joylang va kerakli ishtirokchilar bilan bog'laning.</p>
+      </div>
+      <!-- in-section post button removed per request -->
+      <div id="myAds" class="workers-grid" style="margin-top: 20px;"></div>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section id="trust" class="section">
+    <div class="container">
+      <div class="trust-banner">
+        <div class="trust-content">
+          <h2>Ish beruvchilar uchun ishonchli va barqaror yechim</h2>
+          <p>Platformamizda har bir ishchi va ish beruvchi uchun ochiqlik, tezkor javob va ish shartlarini aniq bo‘lishi muhim.</p>
+          <ul class="trust-features">
+            <li>✓ Profil va telefon tekshiruvi</li>
+            <li>✓ Haqiqiy sharhlar va reytinglar</li>
+            <li>✓ Ishni oldindan band qilish imkoniyati</li>
+          </ul>
+        </div>
+        <div class="trust-stats">
+          <div class="stat-box">
+            <h4>10k+</h4>
+            <p>Mamnun mijozlar</p>
+          </div>
+          <div class="stat-box">
+            <h4>4.8/5</h4>
+            <p>O'rtacha baho</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="contact" class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col brand-col">
+          <a href="#" class="logo footer-logo">Mehnatkash<span>.uz</span></a>
+          <p class="footer-desc">O'zbekistonda kunlik ish, ish topish va ishonchli daromad uchun zamonaviy platforma.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Mijozlar uchun</h4>
+          <ul>
+            <li><a href="#">Ishchi toping</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Ishchilar uchun</h4>
+          <ul>
+            <li><a href="#">Ishchi sifatida qo'shiling</a></li>
+            <li><a href="#">Muvaffaqiyat hikoyalari</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Biz bilan bog'laning</h4>
+          <ul>
+            <li><a href="mailto:abrorabdullayev862@gmail.com">support@mehnatkashlar.uz</a></li>
+            <li><a href="tel:+998901234567">+998 95 729 11 75</a></li>
+            <li><span>Toshkent, O'zbekiston</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Mehnatkashlar.uz. barcha huquqlar himoyalangan.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modals -->
+
+  <div class="modal-overlay" id="messageModal">
+    <div class="modal-content" style="max-width: 400px; padding: 32px; text-align: center;">
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Xabar</h3>
+      <p id="messageText" style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.5;"></p>
+      <button class="btn-primary" id="messageOkBtn" style="width: 100%;">Tushunarli</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-content" style="max-width: 400px; padding: 32px; text-align: center;">
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Tasdiqlash</h3>
+      <p id="confirmText" style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.5;"></p>
+      <div style="display: flex; gap: 12px;">
+        <button class="btn-outline" id="confirmCancelBtn" style="flex: 1;">Bekor qilish</button>
+        <button class="btn-primary" id="confirmOkBtn" style="flex: 1; background: var(--secondary);">Tasdiqlash</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Modal -->
+  <div class="modal-overlay" id="accountModal">
+    <div class="modal-content" style="max-width: 420px; padding: 28px;">
+      <button class="modal-close" id="accountCloseBtn">✕</button>
+      <div class="account-modal-head">
+        <div class="account-modal-avatar" id="accountAvatar">U</div>
+        <div>
+          <h3 id="accountName" style="margin: 0 0 6px; font-size: 20px;"></h3>
+          <p id="accountPhone" class="muted" style="margin: 0;"></p>
+        </div>
+      </div>
+      <div class="account-modal-info">
+        <div>
+          <span class="muted">Rol</span>
+          <strong id="accountRole"></strong>
+        </div>
+        <div>
+          <span class="muted">Status</span>
+          <strong>Faol</strong>
+        </div>
+        <div>
+          <span class="muted">Email</span>
+          <strong id="accountEmail">—</strong>
+        </div>
+        <div>
+          <span class="muted">Manzil</span>
+          <strong id="accountLocation">—</strong>
+        </div>
+      </div>
+      <div class="account-modal-edit">
+        <div id="accountEditFields" class="account-edit-fields hidden">
+          <label for="accountEditName">Ism Familiya</label>
+          <input type="text" id="accountEditName" placeholder="Ism Familiya">
+          <label for="accountEditPhone">Telefon</label>
+          <input type="text" id="accountEditPhone" placeholder="+998">
+          <button class="btn-outline" id="profileAvatarBtn" type="button">Rasm yuklash</button>
+          <input type="file" id="profileAvatarInput" accept="image/*" style="display: none;">
+        </div>
+        <div class="account-edit-actions">
+          <button class="btn-outline hidden" id="accountCancelBtn" type="button">Bekor qilish</button>
+          <button class="btn-primary hidden" id="accountSaveBtn" type="button">Saqlash</button>
+        </div>
+      </div>
+      <div class="account-modal-actions">
+        <button class="btn-outline" id="accountEditBtn">Tahrirlash</button>
+        <button class="btn-primary" id="accountLogoutBtn">Chiqish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Modal -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-content" style="max-width: 400px; padding: 32px;">
+      <button class="modal-close" onclick="document.getElementById('authModal').classList.remove('open')">✕</button>
+      <div id="loginView">
+        <h2 style="margin-bottom: 24px;">Kirish</h2>
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 8px;">Telefon raqam</label>
+          <input type="text" id="loginPhone" placeholder="+998"
+            style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 16px;">
+        </div>
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 8px;">Parol</label>
+          <input type="password" id="loginPassword" placeholder="***"
+            style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 16px;">
+        </div>
+        <button class="btn-primary btn-full" id="loginBtn">Kirish</button>
+        <p style="margin-top: 16px; text-align: center; color: var(--text-muted);">
+          Hisobingiz yo'qmi? <a href="#"
+            onclick="document.getElementById('loginView').style.display='none'; document.getElementById('registerView').style.display='block';"
+            style="color: var(--primary); font-weight: 600;">Ro'yxatdan o'tish</a>
+        </p>
+      </div>
+
+      <div id="registerView" style="display: none;">
+        <h2 style="margin-bottom: 24px;">Ro'yxatdan o'tish</h2>
+        <div style="margin-bottom: 16px; display: flex; gap: 12px;">
+          <div style="flex: 1;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Ism</label>
+            <input type="text" id="regFirstName"
+              style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+          </div>
+          <div style="flex: 1;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Familiya</label>
+            <input type="text" id="regLastName"
+              style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+          </div>
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 8px;">Telefon</label>
+          <input type="text" id="regPhone" placeholder="+998"
+            style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 8px;">Kasb</label>
+          <select id="regRole"
+            style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+            <option value="client">Mijoz (Ish qidirayapman)</option>
+            <option value="provider">Usta (Xizmat ko'rsataman)</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 8px;">Parol</label>
+          <input type="password" id="regPassword"
+            style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+        </div>
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 8px;">Parolni takrorlang</label>
+          <input type="password" id="regPassword2"
+            style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+        </div>
+        <button class="btn-primary btn-full" id="registerBtn">A'zo bo'lish</button>
+        <p style="margin-top: 16px; text-align: center; color: var(--text-muted);">
+          Hisobingiz bormi? <a href="#"
+            onclick="document.getElementById('registerView').style.display='none'; document.getElementById('loginView').style.display='block';"
+            style="color: var(--primary); font-weight: 600;">Kirish</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Screen Structure -->
+  <div id="screen-messages" class="screen hidden"
+    style="position: fixed; inset: 0; background: var(--surface); z-index: 1000; display: flex; flex-direction: column;">
+    <div class="chat-shell" style="display: flex; flex: 1; height: 100%; overflow: hidden;">
+      <div id="chatList" class="chat-list"
+        style="width: 320px; border-right: 1px solid var(--border); overflow-y: auto; background: var(--bg);"></div>
+      <div class="chat-main" style="flex: 1; display: flex; flex-direction: column; background: var(--surface);">
+        <div
+          style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; background: var(--surface);">
+          <button id="chatBackBtn" class="btn-text" style="display:none;">Orqaga</button>
+          <div style="flex: 1;">
+            <div id="chatTitle" style="font-weight: 700; font-size: 18px; color: var(--text-main);">Suhbat</div>
+            <div id="chatMeta" class="muted" style="font-size: 14px; color: var(--text-muted);"></div>
+          </div>
+          <button onclick="switchTab('home')" class="btn-text" style="font-size: 24px;" aria-label="Yopish">✕</button>
+        </div>
+        <div id="chatThread"
+          style="flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px;"></div>
+        <div id="chatComposeMeta" class="hidden"
+          style="padding: 12px 24px; background: var(--bg); border-top: 1px solid var(--border);"></div>
+        <div
+          style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 12px; background: var(--surface); align-items: center;">
+          <input type="text" id="chatInput" placeholder="Xabar yozing..."
+            style="flex: 1; padding: 14px 20px; border: 1px solid var(--border); border-radius: 100px; outline: none; font-size: 15px; background: var(--bg); color: var(--text-main);" />
+          <button id="chatSendBtn" class="btn-primary"
+            style="border-radius: 100px; padding: 14px 28px;">Yuborish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="chatContextMenu" class="hidden"
+    style="position: fixed; z-index: 2000; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); display: flex; flex-direction: column; min-width: 150px; overflow: hidden;">
+  </div>
+  <script src="http://127.0.0.1:5000/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>

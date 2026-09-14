@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E'lon joylash — Mehnatkash.uz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="post-job-page">
+  <header class="navbar">
+    <div class="container nav-container">
+      <div class="logo-wrapper">
+        <a href="index.html" class="logo">Mehnatkash<span>.uz</span></a>
+      </div>
+      <div class="nav-links hide-mobile">
+        <a href="index.html#home">Bosh sahifa</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-section">
+    <div class="container page-grid">
+      <div class="post-panel">
+        <div class="page-header">
+          <div>
+            <p class="eyebrow">Yangi ish e'lon</p>
+            <h1>Ishchi qidiryapsizmi?</h1>
+            <p class="page-subtitle">Kerakli ishchi sizning e'loningizni ko'rib, ish shartlari bo'yicha siz bilan bog'lanadi.</p>
+          </div>
+        </div>
+
+        <section class="form-section">
+          <div class="section-header-compact">
+            <h2>Asosiy ma'lumot</h2>
+            <p>Qaysi ishchi kerakligini aniq yozing.</p>
+          </div>
+          <label class="field">
+            Qaysi ishchi qidirilmoqda?
+            <input type="text" id="jobTitle" placeholder="Masalan: Tajribali santexnik, elektr montajchisi" required />
+          </label>
+          <label class="field">
+            Kategoriyani tanlang
+            <select id="jobCategory" required>
+              <option value="">Kategoriya tanlang</option>
+              <option value="Pol ta'miri">Pol ta'miri</option>
+              <option value="Tom ta'miri">Tom ta'miri</option>
+              <option value="Bo'yoq/Bezash">Bo'yoq/Bezash</option>
+              <option value="Mardikor">Mardikor</option>
+              <option value="Elektrik">Elektrik</option>
+              <option value="IT xizmati">IT xizmati</option>
+              <option value="Santexnik">Santexnik</option>
+              <option value="Mashin ta'mirlash">Mashin ta'mirlash</option>
+            </select>
+          </label>
+          <label class="field">
+            Ish haqini yozing
+            <input type="number" id="jobBudget" placeholder="Masalan: 120000" min="1" required />
+          </label>
+          <label class="field">
+            Bog'lanish uchun telefon
+            <input type="tel" id="jobContact" placeholder="+998 90 123 45 67" required />
+          </label>
+          <label class="field">
+            Qisqacha tavsif
+            <textarea id="jobDescription" rows="5" placeholder="Ish joyi, boshlash sanasi, muddat va shartlar haqida yozing..." required></textarea>
+          </label>
+        </section>
+
+        <section class="form-section">
+          <div class="section-header-compact">
+            <h2>Joylashuv</h2>
+            <p>Ish qayerda olib borilishi kerakligini ko'rsating.</p>
+          </div>
+          <div class="field-grid">
+            <label class="field">
+              Viloyat
+              <select id="postRegion" required>
+                <option value="">Viloyat tanlang</option>
+              </select>
+            </label>
+            <label class="field">
+              Tuman/Shahar
+              <select id="postDistrict" disabled required>
+                <option value="">Tumanni tanlang</option>
+              </select>
+            </label>
+          </div>
+          <label class="field">
+            Aniq manzil
+            <input type="text" id="jobAddress" placeholder="Masalan: Amir Temur shoh ko'chasi, 15" required />
+          </label>
+        </section>
+      </div>
+
+      <aside class="post-sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-head">
+            <h3>Chop etish</h3>
+            <p>E'lonni tekshirib, sahifaga joylang.</p>
+          </div>
+          <button class="btn-primary btn-full" id="publishBtn" type="button">Chop etish</button>
+          <button class="btn-outline btn-full" id="saveDraftBtn" type="button">Qoralamaga saqlash</button>
+          <button class="btn-secondary btn-full" id="previewBtn" type="button">Oldindan ko'rish</button>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-head">
+            <h3>Yordam</h3>
+            <p>Ishchi tanlashda tezkor maslahat.</p>
+          </div>
+          <ul class="help-list">
+            <li>Qisqacha biroq aniq sarlavha yozing.</li>
+            <li>Hududni va ish vaqtini belgilang.</li>
+            <li>Telefon va to'g'ri bog'lanish ma'lumotlari.</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="postPreviewModal">
+    <div class="modal-content" style="max-width: 640px; padding: 24px;">
+      <button class="modal-close" id="previewCloseBtn">✕</button>
+      <h2 style="margin-bottom: 16px;">E'lon oldindan ko'rish</h2>
+      <div id="previewContent"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="messageModal">
+    <div class="modal-content" style="max-width: 400px; padding: 32px; text-align: center;">
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Xabar</h3>
+      <p id="messageText" style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.5;"></p>
+      <button class="btn-primary" id="messageOkBtn" style="width: 100%;" type="button">Tushunarli</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
