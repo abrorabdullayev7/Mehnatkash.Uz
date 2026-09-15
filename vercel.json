@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/", "destination": "/frontend/index.html" },
+    { "source": "/index.html", "destination": "/frontend/index.html" },
     { "source": "/post-job.html", "destination": "/frontend/post-job.html" },
     { "source": "/auth.html", "destination": "/frontend/auth.html" },
     { "source": "/style.css", "destination": "/frontend/style.css" },
