@@ -22,6 +22,7 @@ const inputs = {
   regLastName: document.getElementById("regLastName"),
   regPhone: document.getElementById("regPhone"),
   regRole: document.getElementById("regRole"),
+  regRegion: document.getElementById("regRegion"),
   regPassword: document.getElementById("regPassword"),
   regPassword2: document.getElementById("regPassword2")
 };
@@ -67,16 +68,17 @@ function toPublicUser(user) {
     fullName: user.fullName,
     phone: user.phone,
     role: user.role,
+    region: user.region || "",
     avatar: user.avatar || ""
   };
 }
 
-function localRegister({ fullName, phone, password, role }) {
+function localRegister({ fullName, phone, password, role, region }) {
   const cleanName = String(fullName || "").trim().replace(/\s+/g, " ");
   const phoneKey = normalizePhoneKey(phone);
   const pass = String(password || "");
   const normalizedRole = String(role || "client").toLowerCase() === "provider" ? "provider" : "client";
-  if (!cleanName || !phoneKey || !pass) throw new Error("Barcha maydonlarni to'ldiring.");
+  if (!cleanName || !phoneKey || !pass || !region) throw new Error("Barcha maydonlarni to'ldiring.");
   if (phoneKey.length !== 9) throw new Error("Telefon raqam noto'g'ri.");
 
   const users = readLocalUsers();
@@ -91,6 +93,7 @@ function localRegister({ fullName, phone, password, role }) {
     phoneKey,
     password: pass,
     role: normalizedRole,
+    region,
     avatar: "",
     createdAt: new Date().toISOString()
   };
@@ -252,9 +255,10 @@ registerForm.addEventListener("submit", async (event) => {
   const lastName = inputs.regLastName.value.trim();
   const phone = inputs.regPhone.value.trim();
   const role = inputs.regRole.value;
+  const region = inputs.regRegion.value;
   const password = inputs.regPassword.value;
   const password2 = inputs.regPassword2.value;
-  if (!firstName || !lastName || !phone || !password || !password2) {
+  if (!firstName || !lastName || !phone || !region || !password || !password2) {
     return showAlert(registerAlert, "Barcha maydonlarni to'ldiring.");
   }
   if (password.length < 4) return showAlert(registerAlert, "Parol kamida 4 ta belgi bo'lsin.");
@@ -263,8 +267,8 @@ registerForm.addEventListener("submit", async (event) => {
     showAlert(registerAlert, "Tekshirilmoqda...", "success");
     const data = await authRequestWithFallback(
       "register",
-      { fullName: `${firstName} ${lastName}`, phone, password },
-      { role }
+      { fullName: `${firstName} ${lastName}`, phone, password, role, region },
+      { role, region }
     );
     saveSession(data.user, data.token);
     updateSessionCard();

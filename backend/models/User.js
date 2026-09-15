@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, trim: true, lowercase: true },
     passwordHash: { type: String, required: true },
     language: { type: String, enum: ["uz", "ru"], default: "uz" },
+    region: { type: String, trim: true },
     city: { type: String, trim: true },
     district: { type: String, trim: true },
     location: {

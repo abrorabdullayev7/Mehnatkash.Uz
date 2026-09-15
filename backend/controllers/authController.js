@@ -25,10 +25,10 @@ function normalizeIdentityName(value) {
 
 exports.register = async (req, res) => {
   try {
-    const { fullName, phone, email, password, role, city, district } = req.body;
+    const { fullName, phone, email, password, role, region, city, district } = req.body;
 
-    if (!fullName || !phone || !password) {
-      return res.status(400).json({ message: "fullName, phone va password majburiy" });
+    if (!fullName || !phone || !password || !region) {
+      return res.status(400).json({ message: "Ism, telefon, parol va viloyat majburiy" });
     }
 
     const exists = await User.findOne({ phone });
@@ -50,6 +50,7 @@ exports.register = async (req, res) => {
       email,
       passwordHash,
       role: safeRole,
+      region,
       city,
       district
     });

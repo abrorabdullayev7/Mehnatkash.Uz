@@ -106,6 +106,7 @@ async function refreshProfileFromServer({ silent = true } = {}) {
                     ...normalized
                 });
                 saveState();
+                syncPostRegionWithProfile();
                 updateAuthLockUI();
                 renderProfile();
                 renderAccountModal();
@@ -393,16 +394,17 @@ function toPublicUser(user) {
         fullName: user.fullName,
         phone: user.phone,
         role: normalizeUserRole(user.role),
+        region: user.region || "",
         avatar: user.avatar || ""
     };
 }
 
-function localRegister({ fullName, phone, password, role }) {
+function localRegister({ fullName, phone, password, role, region }) {
     const cleanName = String(fullName || "").trim().replace(/\s+/g, " ");
     const phoneKey = normalizePhoneKey(phone);
     const pass = String(password || "");
     const normalizedRole = normalizeUserRole(role);
-    if (!cleanName || !phoneKey || !pass) throw new Error("Barcha maydonlarni to'ldiring");
+    if (!cleanName || !phoneKey || !pass || !region) throw new Error("Barcha maydonlarni to'ldiring");
     if (phoneKey.length !== 9) throw new Error("Telefon raqam noto'g'ri.");
 
     const users = readLocalUsers();
@@ -417,6 +419,7 @@ function localRegister({ fullName, phone, password, role }) {
         phoneKey,
         password: pass,
         role: normalizedRole,
+        region,
         avatar: "",
         createdAt: new Date().toISOString()
     };
@@ -630,7 +633,20 @@ function validatePostForm(data) {
         return "Iltimos, to'g'ri telefon raqamini kiriting.";
     }
     if (Number(data.budget) <= 0) return "Ish haqi 0 dan katta bo'lishi kerak.";
+    if (state.profile?.region && data.region !== state.profile.region) {
+        return "E'lon manzili siz ro'yxatdan o'tgan viloyat bilan bir xil bo'lishi kerak.";
+    }
+    if (!state.profile?.region) return "E'lon joylash uchun profilingizda yashash viloyati ko'rsatilgan bo'lishi kerak.";
     return "";
+}
+
+function syncPostRegionWithProfile() {
+    const select = document.getElementById("postRegion");
+    const profileRegion = String(state.profile?.region || "");
+    if (!select || !profileRegion) return;
+    select.value = profileRegion;
+    select.disabled = true;
+    fillDistricts(profileRegion);
 }
 
 function clearPostForm() {
@@ -2708,6 +2724,7 @@ function initApp() {
     syncBottomNavHeight();
     fillRegions("regionSelect", "Barcha hududlar");
     fillRegions("postRegion", "Viloyat tanlang");
+    syncPostRegionWithProfile();
     document.getElementById("postRegion")?.addEventListener("change", (e) => fillDistricts(e.target.value));
     const langSelectEl = document.getElementById("langSelect");
     if (langSelectEl) langSelectEl.value = state.lang;
