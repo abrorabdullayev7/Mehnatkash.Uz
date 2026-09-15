@@ -722,10 +722,8 @@ img {
 }
 
 .hero-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 64px;
-  align-items: center;
+  display: flex;
+  justify-content: center;
 }
 
 .badge {
@@ -758,6 +756,7 @@ img {
   line-height: 1.1;
   margin-bottom: 24px;
   letter-spacing: -1.5px;
+  text-align: center;
 }
 
 .hero-content p {
@@ -766,6 +765,12 @@ img {
   margin-bottom: 24px;
   max-width: 620px;
   line-height: 1.7;
+  text-align: center;
+}
+
+.hero-content {
+  width: 100%;
+  max-width: 1120px;
 }
 
 .hero-badges {
@@ -796,6 +801,8 @@ img {
   gap: 12px;
   margin-bottom: 32px;
   border: 1px solid rgba(255, 255, 255, 0.4);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .glass-panel {
