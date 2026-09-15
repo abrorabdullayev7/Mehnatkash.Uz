@@ -1548,9 +1548,6 @@ function showChatContextMenu({ chatId, msgId, sender, x, y }) {
         { key: "pin", label: state.chatPinned[chatId] ? "Unpin" : "Pin", icon: "📌" },
         { key: "mark-unread", label: "Mark as unread", icon: "◌" },
         { key: "mute", label: state.chatMuted[chatId] ? "Unmute" : "Mute notifications", icon: "🔕" },
-        { key: "disable-sound", label: "Disable sound", icon: "♩" },
-        { key: "mute-for", label: "Mute for...", icon: "◷" },
-        { key: "mute-forever", label: "Mute forever", icon: "🔇" },
         { key: "clear-chat", label: "Clear chat", icon: "⌫" },
         { key: "delete-chat", label: "Delete chat", icon: "🗑" }
     ] : [
@@ -1562,12 +1559,25 @@ function showChatContextMenu({ chatId, msgId, sender, x, y }) {
     }
     if (!isChatMenu) actions.push({ key: "delete", label: ui.deleteBtn, icon: "🗑" });
 
-    menu.innerHTML = actions.map((a) => `
+    const menuItem = (a) => `
         <button type="button" class="chat-menu-item ${a.key.includes("delete") ? "danger" : ""}" data-chat-menu-action="${a.key}">
             <span class="chat-menu-icon">${a.icon}</span>
             <span>${escapeHtml(a.label)}</span>
         </button>
-    `).join("");
+    `;
+    menu.innerHTML = actions.map(menuItem).join("");
+    if (isChatMenu) {
+        const muteButton = menu.querySelector('[data-chat-menu-action="mute"]');
+        const muteGroup = document.createElement("div");
+        muteGroup.className = "chat-menu-mute-group";
+        muteGroup.innerHTML = `${muteButton?.outerHTML || ""}
+            <div class="chat-mute-submenu">
+                ${menuItem({ key: "disable-sound", label: "Disable sound", icon: "♩" })}
+                ${menuItem({ key: "mute-for", label: "Mute for...", icon: "◷" })}
+                ${menuItem({ key: "mute-forever", label: "Mute forever", icon: "🔇" })}
+            </div>`;
+        muteButton?.replaceWith(muteGroup);
+    }
     menu.classList.remove("hidden");
     menu.setAttribute("aria-hidden", "false");
 

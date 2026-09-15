@@ -1599,6 +1599,34 @@ img {
   transition: background 0.16s ease, color 0.16s ease;
 }
 
+.chat-menu-mute-group {
+  position: relative;
+}
+
+.chat-mute-submenu {
+  position: absolute;
+  right: calc(100% + 6px);
+  top: -1px;
+  z-index: 1;
+  min-width: 178px;
+  padding: 6px;
+  border: 1px solid #dbe4ee;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.15);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(5px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.chat-menu-mute-group:hover .chat-mute-submenu,
+.chat-menu-mute-group:focus-within .chat-mute-submenu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
 .chat-menu-item:hover {
   background: #eef6ff;
   color: #2563eb;
