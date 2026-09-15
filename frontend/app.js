@@ -65,19 +65,9 @@ const categoryIcons = {
 };
 
 const defaultChatContacts = [
-    { id: "chat-akmal", name: "Akmal Usta", role: "Santexnika" },
-    { id: "chat-jasur", name: "Jasur Elektrik", role: "Elektrik" }
+    
 ];
-const masters = [
-    { id: 1, name: "Polchi Rustam", category: "Pol ta'miri", region: "Toshkent shahri", district: "Chilonzor", rating: 4.8, reviews: 156, price: 120000, phone: "+998 90 111 22 33", bio: "Pol ta'mirlash va o'rnatish ishlari. 10 yillik tajriba." },
-    { id: 2, name: "Murod Tom Usta", category: "Tom ta'miri", region: "Samarqand viloyati", district: "Urgut", rating: 4.6, reviews: 72, price: 200000, phone: "+998 90 222 33 44", bio: "Tom yopish va tom ta'mirlash xizmatlari. Yuqori sifat va kafolat." },
-    { id: 3, name: "Boyoq Usta Jamshid", category: "Bo'yoq/Bezash", region: "Toshkent shahri", district: "Mirobod", rating: 4.5, reviews: 98, price: 80000, phone: "+998 90 333 44 55", bio: "Duvol boyoq va bezash ishlari. Zamonaviy usullar." },
-    { id: 4, name: "Mardikor Karim", category: "Mardikor", region: "Toshkent viloyati", district: "Bekobod", rating: 4.7, reviews: 187, price: 100000, phone: "+998 90 444 55 66", bio: "Barcha bo'yi mardikor ishlari. Sifat kafolatlangan." },
-    { id: 5, name: "Samad Elektrik", category: "Elektrik", region: "Toshkent shahri", district: "Shayxontohur", rating: 4.6, reviews: 75, price: 140000, phone: "+998 91 999 77 66", bio: "Elektr ishlari va o'rnatish mutaxassisi." },
-    { id: 6, name: "Dilshod IT", category: "IT xizmati", region: "Samarqand viloyati", district: "Samarqand shahri", rating: 4.7, reviews: 45, price: 180000, phone: "+998 93 555 77 88", bio: "Kompyuter va internet sozlash. Printer va boshqa qurilmalar." },
-    { id: 7, name: "Santexnik Alisher", category: "Santexnik", region: "Toshkent shahri", district: "Chilonzor", rating: 4.8, reviews: 245, price: 130000, phone: "+998 90 666 11 22", bio: "Barcha santexnik ishlarini sifatli bajaraydi. 15 yillik tajriba." },
-    { id: 8, name: "Mashin Shokirjon", category: "Mashin ta'mirlash", region: "Toshkent shahri", district: "Chilonzor", rating: 4.9, reviews: 312, price: 160000, phone: "+998 90 888 11 22", bio: "Avtomobil ta'mirlash va motor diagnostikasi. 20 yillik tajriba." }
-];
+const masters = [];
 
 const API_BASE = (localStorage.getItem("ustatop_api_base") || (location.port === "5000" ? "/api" : "http://127.0.0.1:5000/api")).replace(/\/+$/, "");
 
@@ -156,7 +146,9 @@ const state = {
     chatContacts: JSON.parse(localStorage.getItem("ustatop_chat_contacts") || "null") || defaultChatContacts,
     chats: JSON.parse(localStorage.getItem("ustatop_chats") || "{}"),
     chatSeenAt: JSON.parse(localStorage.getItem("ustatop_chat_seen_at") || "{}"),
-    activeChatId: localStorage.getItem("ustatop_active_chat") || defaultChatContacts[0].id,
+    chatPinned: JSON.parse(localStorage.getItem("ustatop_chat_pinned") || "{}"),
+    chatMuted: JSON.parse(localStorage.getItem("ustatop_chat_muted") || "{}"),
+    activeChatId: localStorage.getItem("ustatop_active_chat") || "",
     adminAccount: null,
     adminSession: false,
     adminDashboardTab: localStorage.getItem(ADMIN_TAB_STORE_KEY) || "overview"
@@ -191,6 +183,8 @@ function saveChatAccountState() {
     localStorage.setItem(getChatAccountStoreKey("chats", activeChatOwnerId), JSON.stringify(state.chats || {}));
     localStorage.setItem(getChatAccountStoreKey("chat_seen_at", activeChatOwnerId), JSON.stringify(state.chatSeenAt || {}));
     localStorage.setItem(getChatAccountStoreKey("chat_contacts", activeChatOwnerId), JSON.stringify(state.chatContacts || []));
+    localStorage.setItem(getChatAccountStoreKey("chat_pinned", activeChatOwnerId), JSON.stringify(state.chatPinned || {}));
+    localStorage.setItem(getChatAccountStoreKey("chat_muted", activeChatOwnerId), JSON.stringify(state.chatMuted || {}));
 }
 
 function syncChatAccountScope() {
@@ -200,12 +194,18 @@ function syncChatAccountScope() {
     const savedChats = JSON.parse(localStorage.getItem(getChatAccountStoreKey("chats", userId)) || "null");
     const savedSeenAt = JSON.parse(localStorage.getItem(getChatAccountStoreKey("chat_seen_at", userId)) || "null");
     const savedContacts = JSON.parse(localStorage.getItem(getChatAccountStoreKey("chat_contacts", userId)) || "null");
+    const savedPinned = JSON.parse(localStorage.getItem(getChatAccountStoreKey("chat_pinned", userId)) || "null");
+    const savedMuted = JSON.parse(localStorage.getItem(getChatAccountStoreKey("chat_muted", userId)) || "null");
     if (savedChats && typeof savedChats === "object") state.chats = savedChats;
     else if (activeChatOwnerId) state.chats = {};
     if (savedSeenAt && typeof savedSeenAt === "object") state.chatSeenAt = savedSeenAt;
     else if (activeChatOwnerId) state.chatSeenAt = {};
     if (Array.isArray(savedContacts)) state.chatContacts = savedContacts;
     else if (activeChatOwnerId) state.chatContacts = [];
+    if (savedPinned && typeof savedPinned === "object") state.chatPinned = savedPinned;
+    else if (activeChatOwnerId) state.chatPinned = {};
+    if (savedMuted && typeof savedMuted === "object") state.chatMuted = savedMuted;
+    else if (activeChatOwnerId) state.chatMuted = {};
     activeChatOwnerId = userId;
     localStorage.setItem(CHAT_OWNER_STORE_KEY, userId);
     ensureChatStateShape();
@@ -559,12 +559,8 @@ function syncTopbarHeight() {
 }
 
 function ensureChatStateShape() {
-    if (!Array.isArray(state.chatContacts) || !state.chatContacts.length) {
-        state.chatContacts = [...defaultChatContacts];
-    } else {
-        state.chatContacts = state.chatContacts.filter((c) => c && c.id && c.name);
-        if (!state.chatContacts.length) state.chatContacts = [...defaultChatContacts];
-    }
+    if (!Array.isArray(state.chatContacts)) state.chatContacts = [];
+    state.chatContacts = state.chatContacts.filter((c) => c && c.id && c.name);
 
     if (!state.chats || typeof state.chats !== "object" || Array.isArray(state.chats)) {
         state.chats = {};
@@ -572,6 +568,8 @@ function ensureChatStateShape() {
     if (!state.chatSeenAt || typeof state.chatSeenAt !== "object" || Array.isArray(state.chatSeenAt)) {
         state.chatSeenAt = {};
     }
+    if (!state.chatPinned || typeof state.chatPinned !== "object" || Array.isArray(state.chatPinned)) state.chatPinned = {};
+    if (!state.chatMuted || typeof state.chatMuted !== "object" || Array.isArray(state.chatMuted)) state.chatMuted = {};
 
     state.chatContacts.forEach((c) => {
         if (!Array.isArray(state.chats[c.id])) state.chats[c.id] = [];
@@ -589,6 +587,8 @@ function saveState() {
     localStorage.setItem("ustatop_chat_contacts", JSON.stringify(state.chatContacts));
     localStorage.setItem("ustatop_chats", JSON.stringify(state.chats));
     localStorage.setItem("ustatop_chat_seen_at", JSON.stringify(state.chatSeenAt || {}));
+    localStorage.setItem("ustatop_chat_pinned", JSON.stringify(state.chatPinned || {}));
+    localStorage.setItem("ustatop_chat_muted", JSON.stringify(state.chatMuted || {}));
     localStorage.setItem("ustatop_active_chat", state.activeChatId);
     saveChatAccountState();
     localStorage.setItem("ustatop_theme", state.theme);
@@ -1260,6 +1260,18 @@ function removeAutomatedChatMessages() {
     if (changed) saveState();
 }
 
+function removeDemoData() {
+    const demoChatIds = new Set(["chat-akmal", "chat-jasur"]);
+    state.chatContacts = (state.chatContacts || []).filter((contact) => !demoChatIds.has(contact.id));
+    demoChatIds.forEach((chatId) => {
+        delete state.chats[chatId];
+        delete state.chatPinned[chatId];
+        delete state.chatMuted[chatId];
+    });
+    state.myAds = (state.myAds || []).filter((ad) => ad.ownerId && String(ad.ownerId) !== "1");
+    saveState();
+}
+
 function initChatRealtime() {
     if (!window.io || chatSocket) return;
     const socketUrl = API_BASE.replace(/\/api$/, "");
@@ -1531,17 +1543,23 @@ function showChatContextMenu({ chatId, msgId, sender, x, y }) {
     if (!menu) return;
 
     const ui = getChatUiText();
-    const actions = [
+    const isChatMenu = !msgId;
+    const actions = isChatMenu ? [
+        { key: "pin", label: state.chatPinned[chatId] ? "Unpin" : "Pin", icon: "📌" },
+        { key: "mute", label: state.chatMuted[chatId] ? "Unmute" : "Mute", icon: "🔕" },
+        { key: "clear-chat", label: "Clear chat", icon: "⌫" },
+        { key: "delete-chat", label: "Delete chat", icon: "🗑" }
+    ] : [
         { key: "reply", label: ui.replyTo, icon: "↩" },
         { key: "copy", label: ui.copyBtn, icon: "⧉" }
     ];
-    if (sender === "me") {
+    if (!isChatMenu && sender === "me") {
         actions.splice(1, 0, { key: "edit", label: ui.editBtn, icon: "✎" });
-        actions.push({ key: "delete", label: ui.deleteBtn, icon: "🗑" });
     }
+    if (!isChatMenu) actions.push({ key: "delete", label: ui.deleteBtn, icon: "🗑" });
 
     menu.innerHTML = actions.map((a) => `
-        <button type="button" class="chat-menu-item ${a.key === "delete" ? "danger" : ""}" data-chat-menu-action="${a.key}">
+        <button type="button" class="chat-menu-item ${a.key.includes("delete") ? "danger" : ""}" data-chat-menu-action="${a.key}">
             <span class="chat-menu-icon">${a.icon}</span>
             <span>${escapeHtml(a.label)}</span>
         </button>
@@ -1568,6 +1586,21 @@ async function handleChatMenuAction(actionKey) {
     if (!chatContextMenuState) return;
     const ui = getChatUiText();
     const { chatId, msgId, sender } = chatContextMenuState;
+    if (!msgId) {
+        if (actionKey === "pin") state.chatPinned[chatId] = !state.chatPinned[chatId];
+        if (actionKey === "mute") state.chatMuted[chatId] = !state.chatMuted[chatId];
+        if (actionKey === "clear-chat") state.chats[chatId] = [];
+        if (actionKey === "delete-chat") {
+            state.chatContacts = state.chatContacts.filter((contact) => contact.id !== chatId);
+            delete state.chats[chatId];
+            delete state.chatPinned[chatId];
+            delete state.chatMuted[chatId];
+            if (state.activeChatId === chatId) state.activeChatId = state.chatContacts[0]?.id || "";
+        }
+        saveState();
+        renderMessagesScreen();
+        return;
+    }
     const message = getChatMessageById(chatId, msgId);
     hideChatContextMenu();
     if (!message) return;
@@ -1601,7 +1634,7 @@ async function handleChatMenuAction(actionKey) {
         return;
     }
 
-    if (actionKey === "delete" && sender === "me") {
+    if (actionKey === "delete") {
         showConfirm(ui.deleteConfirm, () => {
             const idx = getChatMessageIndex(chatId, msgId);
             if (idx < 0) return;
@@ -1635,7 +1668,10 @@ function renderMessagesScreen() {
     list.classList.toggle("hidden", isCompact && isChatView);
     main.classList.toggle("hidden", isCompact && !isChatView);
 
-    const sortedRaw = [...state.chatContacts].sort((a, b) => getLastMessageTime(b.id) - getLastMessageTime(a.id));
+    const sortedRaw = [...state.chatContacts].sort((a, b) => {
+        const pinDiff = Number(!!state.chatPinned[b.id]) - Number(!!state.chatPinned[a.id]);
+        return pinDiff || getLastMessageTime(b.id) - getLastMessageTime(a.id);
+    });
     const seenKeys = new Set();
     const sorted = sortedRaw.filter((c) => {
         const key = `${String(c.name || "").trim().toLowerCase()}|${String(c.role || "").trim().toLowerCase()}`;
@@ -1644,7 +1680,7 @@ function renderMessagesScreen() {
         return true;
     });
     list.innerHTML = sorted.length ? sorted.map(c => {
-        const unread = getUnreadCount(c.id);
+        const unread = state.chatMuted[c.id] ? 0 : getUnreadCount(c.id);
         const last = (state.chats[c.id] || []).slice(-1)[0];
         const listTime = last ? formatChatListTime(last.createdAt) : "";
         const emptyPreview = state.lang === "ru" ? "Пока сообщений нет" : state.lang === "en" ? "No messages yet" : "Hozircha xabar yo'q";
@@ -1653,7 +1689,7 @@ function renderMessagesScreen() {
         <div class="chat-user-avatar">${escapeHtml(getInitials(c.name))}</div>
         <div class="chat-user-body">
           <div class="chat-user-row">
-            <span class="chat-user-name">${escapeHtml(c.name)}</span>
+            <span class="chat-user-name">${state.chatPinned[c.id] ? "📌 " : ""}${state.chatMuted[c.id] ? "🔕 " : ""}${escapeHtml(c.name)}</span>
             <span class="chat-user-time">${escapeHtml(listTime)}</span>
           </div>
           <div class="chat-user-preview">${escapeHtml(last?.text || emptyPreview)}</div>
@@ -1671,6 +1707,12 @@ function renderMessagesScreen() {
         saveState();
         renderMessagesScreen();
     }));
+    list.oncontextmenu = (event) => {
+        const chatEl = event.target.closest("[data-chat]");
+        if (!chatEl) return;
+        event.preventDefault();
+        showChatContextMenu({ chatId: chatEl.dataset.chat, msgId: "", sender: "", x: event.clientX, y: event.clientY });
+    };
 
     let curr = state.chatContacts.find(c => c.id === state.activeChatId);
     if (!curr && state.chatContacts.length) {
@@ -2613,6 +2655,7 @@ function performLogout() {
 function initApp() {
     ensureChatStateShape();
     syncChatAccountScope();
+    removeDemoData();
     removeAutomatedChatMessages();
     initChatRealtime();
     localStorage.removeItem(ADMIN_ACCOUNT_STORE_KEY);
@@ -2923,7 +2966,7 @@ function initApp() {
     document.addEventListener("contextmenu", (e) => {
         const target = e.target;
         if (!(target instanceof Element)) return;
-        if (!target.closest(".chat-message")) hideChatContextMenu();
+        if (!target.closest(".chat-message") && !target.closest("[data-chat]")) hideChatContextMenu();
     });
     document.getElementById("chatInput")?.addEventListener("focus", () => {
         const thread = document.getElementById("chatThread");
