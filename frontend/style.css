@@ -1604,6 +1604,10 @@ img {
   color: #2563eb;
 }
 
+.chat-menu-item.danger {
+  color: #dc2626;
+}
+
 .chat-menu-item.danger:hover {
   background: #fff1f2;
   color: #dc2626;
