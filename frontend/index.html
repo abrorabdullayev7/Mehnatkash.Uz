@@ -302,29 +302,24 @@
   <!-- Chat Screen Structure -->
   <div id="screen-messages" class="screen hidden"
     style="position: fixed; inset: 0; background: var(--surface); z-index: 1000; display: flex; flex-direction: column;">
-    <div class="chat-shell" style="display: flex; flex: 1; height: 100%; overflow: hidden;">
-      <div id="chatList" class="chat-list"
-        style="width: 320px; border-right: 1px solid var(--border); overflow-y: auto; background: var(--bg);"></div>
-      <div class="chat-main" style="flex: 1; display: flex; flex-direction: column; background: var(--surface);">
-        <div
-          style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; background: var(--surface);">
-          <button id="chatBackBtn" class="btn-text" style="display:none;">Orqaga</button>
-          <div style="flex: 1;">
-            <div id="chatTitle" style="font-weight: 700; font-size: 18px; color: var(--text-main);">Suhbat</div>
-            <div id="chatMeta" class="muted" style="font-size: 14px; color: var(--text-muted);"></div>
+    <div class="chat-shell">
+      <div id="chatList" class="chat-list"></div>
+      <div class="chat-main">
+        <div class="chat-header">
+          <button id="chatBackBtn" class="btn-text chat-back-btn" style="display:none;">Orqaga</button>
+          <div class="chat-header-copy">
+            <div id="chatTitle" class="chat-title">Suhbat</div>
+            <div id="chatMeta" class="chat-meta"></div>
           </div>
-          <button onclick="switchTab('home')" class="btn-text" style="font-size: 24px;" aria-label="Yopish">✕</button>
+          <button onclick="switchTab('home')" class="chat-close-btn" aria-label="Yopish">✕</button>
         </div>
-        <div id="chatThread"
-          style="flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px;"></div>
-        <div id="chatComposeMeta" class="hidden"
-          style="padding: 12px 24px; background: var(--bg); border-top: 1px solid var(--border);"></div>
-        <div
-          style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 12px; background: var(--surface); align-items: center;">
+        <div id="chatThread" class="chat-thread"></div>
+        <div id="chatComposeMeta" class="hidden chat-compose-meta"></div>
+        <div class="chat-compose">
           <input type="text" id="chatInput" placeholder="Xabar yozing..."
-            style="flex: 1; padding: 14px 20px; border: 1px solid var(--border); border-radius: 100px; outline: none; font-size: 15px; background: var(--bg); color: var(--text-main);" />
+            class="chat-input" />
           <button id="chatSendBtn" class="btn-primary"
-            style="border-radius: 100px; padding: 14px 28px;">Yuborish</button>
+            class="chat-send-btn">Yuborish</button>
         </div>
       </div>
     </div>
