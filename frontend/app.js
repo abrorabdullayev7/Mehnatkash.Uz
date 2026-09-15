@@ -2050,8 +2050,10 @@ function renderProfile() {
     document.getElementById("loginCard")?.classList.toggle("hidden", !!p || state.authView !== "login");
     document.getElementById("registerCard")?.classList.toggle("hidden", !!p || state.authView !== "register");
     if (p) {
-        document.getElementById("profileName").textContent = p.fullName;
-        document.getElementById("profilePhone").textContent = formatPhone(p.phone);
+        const profileName = document.getElementById("profileName");
+        const profilePhone = document.getElementById("profilePhone");
+        if (profileName) profileName.textContent = p.fullName;
+        if (profilePhone) profilePhone.textContent = formatPhone(p.phone);
         const roleSelect = document.getElementById("profileRoleSelect");
         if (roleSelect) roleSelect.value = normalizeUserRole(p.role);
         const preview = document.getElementById("profileAvatarPreview");
@@ -2878,6 +2880,10 @@ function initApp() {
             updateAuthLockUI();
             renderProfile();
             refreshProfileFromServer({ silent: true });
+            if (normalizeAccountRole(d.user?.role) === "admin") {
+                window.location.href = "dashboard.html";
+                return;
+            }
             // Agar provider bo'lsa va profileComplete false bo'lsa, profilni to'ldirishni so'raymiz
             if ((normalizeAccountRole(d.user?.role) === "provider") && d.profileComplete === false) {
                 showMessage("Iltimos, profilingizni to'ldiring — profil sahifasiga yo'naltirilyapti.");
@@ -3177,6 +3183,13 @@ function initApp() {
 
     state.authView = state.profile ? state.authView : "login";
     updateAuthLockUI();
+    if (document.body.dataset.page === "dashboard") {
+        if (!isAdminLoggedIn()) {
+            window.location.replace("auth.html#login");
+            return;
+        }
+        renderProfile();
+    }
     // render showcase and then go to home
     renderTopShowcase();
     renderCategories();

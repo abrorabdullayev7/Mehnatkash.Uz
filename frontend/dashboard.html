@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Mehnatkash.uz admin dashboard">
+  <title>Admin Dashboard - Mehnatkash.uz</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body data-page="dashboard">
+  <header class="dashboard-header">
+    <div class="dashboard-shell dashboard-header-inner">
+      <a class="logo" href="index.html">Mehnatkash<span>.uz</span></a>
+      <div class="dashboard-header-actions">
+        <span class="dashboard-live"><span></span> Tizim faol</span>
+        <a class="btn-outline" href="index.html">Bosh sahifa</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-shell dashboard-main">
+    <section class="dashboard-intro">
+      <div>
+        <p class="dashboard-eyebrow">Boshqaruv markazi</p>
+        <h1>Admin dashboard</h1>
+        <p>Platformadagi foydalanuvchilar, e'lonlar va faollikni bir joydan kuzating.</p>
+      </div>
+      <div class="dashboard-admin-badge">
+        <div class="dashboard-admin-avatar">A</div>
+        <div><strong id="adminCurrentName">Admin</strong><span id="adminCurrentUsername">-</span></div>
+      </div>
+    </section>
+
+    <section class="admin-card" id="adminProfileCard">
+      <div id="adminSetupBox" class="hidden"></div>
+      <div id="adminLoginBox" class="hidden"></div>
+      <div id="adminSessionBox" class="admin-session-bar">
+        <div>
+          <span class="admin-session-label">Admin holati</span>
+          <strong id="adminStatusText">Tekshirilmoqda...</strong>
+        </div>
+        <button class="btn-outline" id="adminLogoutBtn" type="button">Chiqish</button>
+      </div>
+
+      <nav class="admin-tabs" aria-label="Dashboard bo'limlari">
+        <button type="button" data-admin-tab="overview" class="active">Umumiy</button>
+        <button type="button" data-admin-tab="users">Foydalanuvchilar</button>
+        <button type="button" data-admin-tab="ads">E'lonlar</button>
+        <button type="button" data-admin-tab="messages">Xabarlar</button>
+        <button type="button" data-admin-tab="analytics">Tahlil</button>
+        <button type="button" data-admin-tab="system">Tizim</button>
+      </nav>
+
+      <div id="adminDashboardContent" class="admin-dashboard-content"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -205,9 +205,11 @@ function updateSessionCard() {
   sessionMeta.textContent = `${profile.fullName || "-"} • ${formatPhone(profile.phone || "")}`;
 }
 
-function redirectToHome() {
+function redirectToHome(user) {
   setTimeout(() => {
-    window.location.href = "index.html";
+    window.location.href = String(user?.role || "").toLowerCase() === "admin"
+      ? "dashboard.html"
+      : "index.html";
   }, 900);
 }
 
@@ -243,7 +245,7 @@ loginForm.addEventListener("submit", async (event) => {
     saveSession(data.user, data.token);
     updateSessionCard();
     showAlert(loginAlert, "Muvaffaqiyatli kirdingiz. Yo'naltirilmoqda...", "success");
-    redirectToHome();
+    redirectToHome(data.user);
   } catch (error) {
     showAlert(loginAlert, error.message || "Kirishda xatolik yuz berdi.");
   }
