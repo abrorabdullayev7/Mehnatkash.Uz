@@ -148,7 +148,6 @@ const state = {
     chatSeenAt: JSON.parse(localStorage.getItem("ustatop_chat_seen_at") || "{}"),
     chatPinned: JSON.parse(localStorage.getItem("ustatop_chat_pinned") || "{}"),
     chatMuted: JSON.parse(localStorage.getItem("ustatop_chat_muted") || "{}"),
-    chatArchived: JSON.parse(localStorage.getItem("ustatop_chat_archived") || "{}"),
     activeChatId: localStorage.getItem("ustatop_active_chat") || "",
     adminAccount: null,
     adminSession: false,
@@ -186,7 +185,6 @@ function saveChatAccountState() {
     localStorage.setItem(getChatAccountStoreKey("chat_contacts", activeChatOwnerId), JSON.stringify(state.chatContacts || []));
     localStorage.setItem(getChatAccountStoreKey("chat_pinned", activeChatOwnerId), JSON.stringify(state.chatPinned || {}));
     localStorage.setItem(getChatAccountStoreKey("chat_muted", activeChatOwnerId), JSON.stringify(state.chatMuted || {}));
-    localStorage.setItem(getChatAccountStoreKey("chat_archived", activeChatOwnerId), JSON.stringify(state.chatArchived || {}));
 }
 
 function syncChatAccountScope() {
@@ -198,7 +196,6 @@ function syncChatAccountScope() {
     const savedContacts = JSON.parse(localStorage.getItem(getChatAccountStoreKey("chat_contacts", userId)) || "null");
     const savedPinned = JSON.parse(localStorage.getItem(getChatAccountStoreKey("chat_pinned", userId)) || "null");
     const savedMuted = JSON.parse(localStorage.getItem(getChatAccountStoreKey("chat_muted", userId)) || "null");
-    const savedArchived = JSON.parse(localStorage.getItem(getChatAccountStoreKey("chat_archived", userId)) || "null");
     if (savedChats && typeof savedChats === "object") state.chats = savedChats;
     else if (activeChatOwnerId) state.chats = {};
     if (savedSeenAt && typeof savedSeenAt === "object") state.chatSeenAt = savedSeenAt;
@@ -209,8 +206,6 @@ function syncChatAccountScope() {
     else if (activeChatOwnerId) state.chatPinned = {};
     if (savedMuted && typeof savedMuted === "object") state.chatMuted = savedMuted;
     else if (activeChatOwnerId) state.chatMuted = {};
-    if (savedArchived && typeof savedArchived === "object") state.chatArchived = savedArchived;
-    else if (activeChatOwnerId) state.chatArchived = {};
     activeChatOwnerId = userId;
     localStorage.setItem(CHAT_OWNER_STORE_KEY, userId);
     ensureChatStateShape();
@@ -575,7 +570,6 @@ function ensureChatStateShape() {
     }
     if (!state.chatPinned || typeof state.chatPinned !== "object" || Array.isArray(state.chatPinned)) state.chatPinned = {};
     if (!state.chatMuted || typeof state.chatMuted !== "object" || Array.isArray(state.chatMuted)) state.chatMuted = {};
-    if (!state.chatArchived || typeof state.chatArchived !== "object" || Array.isArray(state.chatArchived)) state.chatArchived = {};
 
     state.chatContacts.forEach((c) => {
         if (!Array.isArray(state.chats[c.id])) state.chats[c.id] = [];
@@ -595,7 +589,6 @@ function saveState() {
     localStorage.setItem("ustatop_chat_seen_at", JSON.stringify(state.chatSeenAt || {}));
     localStorage.setItem("ustatop_chat_pinned", JSON.stringify(state.chatPinned || {}));
     localStorage.setItem("ustatop_chat_muted", JSON.stringify(state.chatMuted || {}));
-    localStorage.setItem("ustatop_chat_archived", JSON.stringify(state.chatArchived || {}));
     localStorage.setItem("ustatop_active_chat", state.activeChatId);
     saveChatAccountState();
     localStorage.setItem("ustatop_theme", state.theme);
@@ -1552,15 +1545,12 @@ function showChatContextMenu({ chatId, msgId, sender, x, y }) {
     const ui = getChatUiText();
     const isChatMenu = !msgId;
     const actions = isChatMenu ? [
-        { key: "open-window", label: "Open in new window", icon: "▣" },
-        { key: "archive", label: "Archive", icon: "▾" },
         { key: "pin", label: state.chatPinned[chatId] ? "Unpin" : "Pin", icon: "📌" },
         { key: "mark-unread", label: "Mark as unread", icon: "◌" },
         { key: "mute", label: state.chatMuted[chatId] ? "Unmute" : "Mute notifications", icon: "🔕" },
         { key: "disable-sound", label: "Disable sound", icon: "♩" },
         { key: "mute-for", label: "Mute for...", icon: "◷" },
         { key: "mute-forever", label: "Mute forever", icon: "🔇" },
-        { key: "add-folder", label: "Add to folder", icon: "▱" },
         { key: "clear-chat", label: "Clear chat", icon: "⌫" },
         { key: "delete-chat", label: "Delete chat", icon: "🗑" }
     ] : [
@@ -1602,20 +1592,16 @@ async function handleChatMenuAction(actionKey) {
     const { chatId, msgId, sender } = chatContextMenuState;
     if (!msgId) {
         hideChatContextMenu();
-        if (actionKey === "open-window") return window.open(`${window.location.href.split("#")[0]}#messages`, "mehnatkash-chat", "width=1100,height=760");
-        if (actionKey === "archive") state.chatArchived[chatId] = true;
         if (actionKey === "pin") state.chatPinned[chatId] = !state.chatPinned[chatId];
         if (actionKey === "mute") state.chatMuted[chatId] = !state.chatMuted[chatId];
         if (["disable-sound", "mute-for", "mute-forever"].includes(actionKey)) state.chatMuted[chatId] = true;
         if (actionKey === "mark-unread") state.chatSeenAt[chatId] = 0;
-        if (actionKey === "add-folder") return showMessage("Chat papkalar tez orada qo'shiladi.");
         if (actionKey === "clear-chat") state.chats[chatId] = [];
         if (actionKey === "delete-chat") {
             state.chatContacts = state.chatContacts.filter((contact) => contact.id !== chatId);
             delete state.chats[chatId];
             delete state.chatPinned[chatId];
             delete state.chatMuted[chatId];
-            delete state.chatArchived[chatId];
             if (state.activeChatId === chatId) state.activeChatId = state.chatContacts[0]?.id || "";
         }
         saveState();
@@ -1689,7 +1675,7 @@ function renderMessagesScreen() {
     list.classList.toggle("hidden", isCompact && isChatView);
     main.classList.toggle("hidden", isCompact && !isChatView);
 
-    const sortedRaw = state.chatContacts.filter((contact) => !state.chatArchived[contact.id]).sort((a, b) => {
+    const sortedRaw = [...state.chatContacts].sort((a, b) => {
         const pinDiff = Number(!!state.chatPinned[b.id]) - Number(!!state.chatPinned[a.id]);
         return pinDiff || getLastMessageTime(b.id) - getLastMessageTime(a.id);
     });
