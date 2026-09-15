@@ -1608,11 +1608,21 @@ async function handleChatMenuAction(actionKey) {
         if (actionKey === "mark-unread") state.chatSeenAt[chatId] = 0;
         if (actionKey === "clear-chat") state.chats[chatId] = [];
         if (actionKey === "delete-chat") {
-            state.chatContacts = state.chatContacts.filter((contact) => contact.id !== chatId);
-            delete state.chats[chatId];
-            delete state.chatPinned[chatId];
-            delete state.chatMuted[chatId];
-            if (state.activeChatId === chatId) state.activeChatId = state.chatContacts[0]?.id || "";
+            const contact = state.chatContacts.find((item) => item.id === chatId);
+            return showConfirm(
+                `"${contact?.name || "Bu chat"}" bilan barcha xabarlar tarixi o'chirilsinmi?\n\nBu amalni bekor qilib bo'lmaydi.`,
+                () => {
+                    state.chatContacts = state.chatContacts.filter((item) => item.id !== chatId);
+                    delete state.chats[chatId];
+                    delete state.chatPinned[chatId];
+                    delete state.chatMuted[chatId];
+                    if (state.activeChatId === chatId) state.activeChatId = state.chatContacts[0]?.id || "";
+                    saveState();
+                    renderMessagesScreen();
+                },
+                "Chatni o'chirish",
+                "O'chirish"
+            );
         }
         saveState();
         renderMessagesScreen();
@@ -2552,12 +2562,22 @@ function openChatWithMaster(id) {
     state.activeChatId = targetId; state.messagesView = "chat"; switchTab("messages");
 }
 
-function showConfirm(txt, action) {
+function showConfirm(txt, action, title = "Tasdiqlash", confirmLabel = "Tasdiqlash") {
+    const titleEl = document.getElementById("confirmTitle");
+    const confirmBtn = document.getElementById("confirmOkBtn");
+    if (titleEl) titleEl.textContent = title;
+    if (confirmBtn) confirmBtn.textContent = confirmLabel;
     document.getElementById("confirmText").textContent = txt;
     document.getElementById("confirmOkBtn").onclick = () => { action(); closeConfirm(); };
     document.getElementById("confirmModal").classList.add("open");
 }
-function closeConfirm() { document.getElementById("confirmModal").classList.remove("open"); }
+function closeConfirm() {
+    document.getElementById("confirmModal").classList.remove("open");
+    const titleEl = document.getElementById("confirmTitle");
+    const confirmBtn = document.getElementById("confirmOkBtn");
+    if (titleEl) titleEl.textContent = "Tasdiqlash";
+    if (confirmBtn) confirmBtn.textContent = "Tasdiqlash";
+}
 function showMessage(txt) {
     const modal = document.getElementById("messageModal");
     const text = document.getElementById("messageText");
