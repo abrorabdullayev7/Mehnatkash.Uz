@@ -69,7 +69,16 @@ const defaultChatContacts = [
 ];
 const masters = [];
 
-const API_BASE = (localStorage.getItem("ustatop_api_base") || (location.port === "5000" ? "/api" : "http://127.0.0.1:5000/api")).replace(/\/+$/, "");
+const getDefaultApiBase = () => {
+    const hostname = window.location.hostname || "127.0.0.1";
+    if (location.port === "5000") return "/api";
+    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]") {
+        return "http://127.0.0.1:5000/api";
+    }
+    return `http://${hostname}:5000/api`;
+};
+
+const API_BASE = (localStorage.getItem("ustatop_api_base") || getDefaultApiBase()).replace(/\/+$/, "");
 
 async function apiRequest(path, options = {}) {
     const token = localStorage.getItem("ustatop_token");
@@ -603,6 +612,33 @@ function saveState() {
     localStorage.setItem(ADMIN_TAB_STORE_KEY, state.adminDashboardTab || "overview");
 }
 
+async function refreshAdsFromServer({ silent = true } = {}) {
+    const token = localStorage.getItem("ustatop_token");
+    if (!token) {
+        const localAds = JSON.parse(localStorage.getItem("ustatop_ads") || "[]");
+        state.myAds = Array.isArray(localAds) ? localAds : [];
+        renderAds();
+        return state.myAds;
+    }
+
+    try {
+        const response = await apiRequest("/ads");
+        const serverAds = Array.isArray(response?.ads) ? response.ads : [];
+        const localAds = JSON.parse(localStorage.getItem("ustatop_ads") || "[]");
+        const merged = [...serverAds, ...((Array.isArray(localAds) ? localAds : []).filter((ad) => !serverAds.some((item) => String(item.id || item._id) === String(ad.id || ad._id))))];
+        state.myAds = merged;
+        localStorage.setItem("ustatop_ads", JSON.stringify(state.myAds));
+        renderAds();
+        return state.myAds;
+    } catch (error) {
+        if (!silent) showMessage(error?.message || "E'lonlarni yuklashda xatolik yuz berdi.");
+        const localAds = JSON.parse(localStorage.getItem("ustatop_ads") || "[]");
+        state.myAds = Array.isArray(localAds) ? localAds : [];
+        renderAds();
+        return state.myAds;
+    }
+}
+
 function collectPostFormData() {
     return {
         title: document.getElementById("jobTitle")?.value.trim() || "",
@@ -711,8 +747,8 @@ function closePreviewModal() {
     document.getElementById("postPreviewModal")?.classList.remove("open");
 }
 
-function savePostAd(data) {
-    state.myAds.unshift({
+async function savePostAd(data) {
+    const record = {
         id: Date.now(),
         ownerId: state.profile?.id ?? state.profile?._id ?? 1,
         ownerName: state.profile?.fullName || state.profile?.name || "E'lon egasi",
@@ -730,11 +766,45 @@ function savePostAd(data) {
         booked: false,
         bookedBy: null,
         bookedAt: null
-    });
+    };
+
+    const token = localStorage.getItem("ustatop_token");
+    if (token) {
+        try {
+            const payload = {
+                ...record,
+                title: record.name,
+                category: record.spec,
+                budget: record.price,
+                contact: record.phone,
+                description: record.bio,
+                ownerId: record.ownerId,
+                ownerName: record.ownerName,
+                ownerAvatar: record.ownerAvatar,
+                avatar: record.avatar
+            };
+            const response = await apiRequest("/ads", {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            const savedAd = response?.ad || { ...record, id: response?.ad?.id || record.id };
+            state.myAds = [savedAd, ...state.myAds.filter((item) => String(item.id) !== String(savedAd.id))];
+            saveState();
+            renderAds();
+            renderMasters();
+            if (document.getElementById("screen-profile")) renderProfile();
+            return savedAd;
+        } catch (error) {
+            console.warn("Server ad save failed, falling back to local storage:", error);
+        }
+    }
+
+    state.myAds.unshift(record);
     saveState();
     renderAds();
     renderMasters();
     if (document.getElementById("screen-profile")) renderProfile();
+    return record;
 }
 
 function toTs(value) { return new Date(value || 0).getTime(); }
@@ -2742,6 +2812,7 @@ function initApp() {
         });
     }
     refreshProfileFromServer();
+    refreshAdsFromServer({ silent: true });
     applyMessagesFeatureToggle();
     syncBottomNavHeight();
     fillRegions("regionSelect", "Barcha hududlar");
