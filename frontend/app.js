@@ -1423,11 +1423,15 @@ function initChatRealtime() {
 function renderMasters() {
     const q = state.query.trim().toLowerCase();
     const qn = normalizePlace(q);
+    const selectedRegion = document.getElementById("regionSelect")?.value || state.region || "";
+    const selectedDistrict = document.getElementById("districtSelect")?.value || state.district || "";
+    state.region = selectedRegion;
+    state.district = selectedDistrict;
     const all = [...masters, ...state.myAds.map(mapAdToMaster)];
     const filtered = all.filter(m => {
         const catMatch = (state.activeCategory === "Barchasi") || isSameCategory(m.category, state.activeCategory);
-        const regionMatch = !state.region || isSamePlace(m.region, state.region);
-        const districtMatch = !state.district || isSamePlace(m.district, state.district);
+        const regionMatch = !selectedRegion || isSamePlace(m.region, selectedRegion);
+        const districtMatch = !selectedDistrict || isSamePlace(m.district, selectedDistrict);
         const queryMatch = !q || [m.name, m.category, m.district, m.region].some((val) => {
             const text = String(val || "");
             const lower = text.toLowerCase();
