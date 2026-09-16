@@ -633,20 +633,32 @@ function validatePostForm(data) {
         return "Iltimos, to'g'ri telefon raqamini kiriting.";
     }
     if (Number(data.budget) <= 0) return "Ish haqi 0 dan katta bo'lishi kerak.";
-    if (state.profile?.region && data.region !== state.profile.region) {
-        return "E'lon manzili siz ro'yxatdan o'tgan viloyat bilan bir xil bo'lishi kerak.";
-    }
-    if (!state.profile?.region) return "E'lon joylash uchun profilingizda yashash viloyati ko'rsatilgan bo'lishi kerak.";
     return "";
 }
 
 function syncPostRegionWithProfile() {
     const select = document.getElementById("postRegion");
+    const districtSelect = document.getElementById("postDistrict");
     const profileRegion = String(state.profile?.region || "");
-    if (!select || !profileRegion) return;
-    select.value = profileRegion;
-    select.disabled = true;
-    fillDistricts(profileRegion);
+    if (!select) return;
+
+    if (profileRegion) {
+        select.value = profileRegion;
+        select.disabled = false;
+        fillDistricts(profileRegion);
+        if (districtSelect && state.profile?.district) {
+            districtSelect.value = state.profile.district;
+        }
+        return;
+    }
+
+    select.value = "";
+    select.disabled = false;
+    if (districtSelect) {
+        districtSelect.value = "";
+        districtSelect.disabled = true;
+    }
+    fillDistricts("");
 }
 
 function clearPostForm() {
@@ -655,7 +667,15 @@ function clearPostForm() {
         if (el) el.value = "";
     });
     const region = document.getElementById("postRegion");
-    if (region) region.value = "";
+    if (region) {
+        region.value = "";
+        region.disabled = false;
+    }
+    const district = document.getElementById("postDistrict");
+    if (district) {
+        district.value = "";
+        district.disabled = true;
+    }
     fillDistricts("");
 }
 
