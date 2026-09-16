@@ -39,11 +39,28 @@ exports.createAd = async (req, res) => {
       avatar: data.avatar || "",
       booked: !!data.booked,
       bookedBy: data.bookedBy || null,
-      bookedAt: data.bookedAt || null
+      bookedById: data.bookedById || null,
+      bookedAt: data.bookedAt || null,
+      resolution: data.resolution || "pending",
+      rating: data.rating || null,
+      ratingComment: data.ratingComment || "",
+      ratedAt: data.ratedAt || null
     });
 
     return res.status(201).json({ ad });
   } catch (error) {
     return res.status(500).json({ message: "E'lon yaratishda xatolik", error: error.message });
+  }
+};
+
+exports.updateAd = async (req, res) => {
+  try {
+    const allowed = ["booked", "bookedBy", "bookedById", "bookedAt", "resolution", "rating", "ratingComment", "ratedAt"];
+    const updates = Object.fromEntries(Object.entries(req.body || {}).filter(([key]) => allowed.includes(key)));
+    const ad = await Ad.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
+    if (!ad) return res.status(404).json({ message: "E'lon topilmadi" });
+    return res.json({ ad });
+  } catch (error) {
+    return res.status(500).json({ message: "E'lonni yangilashda xatolik", error: error.message });
   }
 };

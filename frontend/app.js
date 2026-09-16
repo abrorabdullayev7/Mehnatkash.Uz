@@ -787,7 +787,7 @@ async function savePostAd(data) {
                 method: "POST",
                 body: JSON.stringify(payload)
             });
-            const savedAd = response?.ad || { ...record, id: response?.ad?.id || record.id };
+            const savedAd = response?.ad ? { ...response.ad, id: response.ad.id || response.ad._id } : record;
             state.myAds = [savedAd, ...state.myAds.filter((item) => String(item.id) !== String(savedAd.id))];
             saveState();
             renderAds();
@@ -805,6 +805,32 @@ async function savePostAd(data) {
     renderMasters();
     if (document.getElementById("screen-profile")) renderProfile();
     return record;
+}
+
+function getAdId(ad) {
+    return String(ad?.id || ad?._id || "");
+}
+
+async function updateAdOnServer(ad, updates) {
+    Object.assign(ad, updates);
+    const token = localStorage.getItem("ustatop_token");
+    const serverId = ad?._id;
+    if (token && serverId) {
+        try {
+            const response = await apiRequest(`/ads/${serverId}`, {
+                method: "PUT",
+                body: JSON.stringify(updates)
+            });
+            Object.assign(ad, response?.ad || {});
+        } catch (error) {
+            console.warn("Ad update failed:", error);
+        }
+    }
+    saveState();
+    renderAds();
+    renderMasters();
+    renderProfile();
+    return ad;
 }
 
 function toTs(value) { return new Date(value || 0).getTime(); }
@@ -913,9 +939,9 @@ function openAdChat(ad) {
     return contact;
 }
 
-function bookAd(adId) {
+async function bookAd(adId) {
     if (!state.profile) return showMessage(getAuthRequiredText());
-    const ad = state.myAds.find((item) => String(item.id) === String(adId));
+    const ad = state.myAds.find((item) => getAdId(item) === String(adId));
     if (!ad) return showMessage("E'lon topilmadi.");
     const currentUserId = getCurrentUserId();
     if (String(ad.ownerId) === currentUserId) {
@@ -924,9 +950,14 @@ function bookAd(adId) {
     // Mark ad as booked and notify owner (without navigating to chat)
     if (ad.booked) return showMessage("Bu e'lon allaqachon band qilingan.");
     const actorName = getCurrentUserDisplayName();
-    ad.booked = true;
-    ad.bookedBy = actorName;
-    ad.bookedAt = new Date().toISOString();
+    const bookingUpdates = {
+        booked: true,
+        bookedBy: actorName,
+        bookedById: currentUserId,
+        bookedAt: new Date().toISOString(),
+        resolution: "pending"
+    };
+    await updateAdOnServer(ad, bookingUpdates);
     // try to notify owner via chat contacts (silent)
     const contact = ensureAdOwnerChat(ad);
     if (contact && Array.isArray(state.chats[contact.id])) {
@@ -937,9 +968,23 @@ function bookAd(adId) {
             createdAt: new Date().toISOString()
         });
     }
-    saveState();
-    renderAds();
-    showMessage("E'lon muvaffaqiyatli band qilindi.");
+    showMessage("E'lon band qilindi. E'lon egasiga xabar yuborildi.");
+}
+
+async function resolveAd(adId, resolution) {
+    const ad = state.myAds.find((item) => getAdId(item) === String(adId));
+    if (!ad || String(ad.ownerId) !== getCurrentUserId()) return showMessage("Bu amal faqat e'lon egasiga tegishli.");
+    const updates = { resolution };
+    if (resolution === "resolved") {
+        const rawRating = window.prompt("Ishchini 1 dan 5 gacha baholang:", "5");
+        const rating = Number(rawRating);
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) return showMessage("Baho 1 dan 5 gacha bo'lishi kerak.");
+        updates.rating = rating;
+        updates.ratingComment = window.prompt("Izoh qoldiring (ixtiyoriy):", "") || "";
+        updates.ratedAt = new Date().toISOString();
+    }
+    await updateAdOnServer(ad, updates);
+    showMessage(resolution === "resolved" ? "Ish hal qilindi va baho profilga saqlandi." : "Ish hal qilinmadi deb belgilandi.");
 }
 
 function mapAdToMaster(ad) {
@@ -950,7 +995,7 @@ function mapAdToMaster(ad) {
         category: resolveCategoryLabel(ad.spec),
         region: ad.region,
         district: ad.district,
-        rating: 0, reviews: 0,
+        rating: ad.rating || 0, reviews: ad.rating ? 1 : 0,
         price: ad.price,
         phone: ad.phone,
         bio: ad.bio || "Foydalanuvchi tomonidan joylangan e'lon."
@@ -2056,7 +2101,15 @@ function renderAds() {
         return;
     }
 
-    box.innerHTML = ads.map((ad) => `
+    box.innerHTML = ads.map((ad) => {
+        const adId = getAdId(ad);
+        const isOwner = String(ad.ownerId) === getCurrentUserId();
+        const ownerActions = isOwner && ad.booked && ad.resolution === "pending"
+            ? `<div class="muted" style="width:100%; text-align:center; margin-bottom:8px;">${escapeHtml(ad.bookedBy || "Foydalanuvchi")} bu e'lonni band qildi.</div>
+                <button class="btn-primary" type="button" data-resolve="${adId}">Hal qilindi</button>
+                <button class="btn-secondary" type="button" data-unresolve="${adId}">Hal qilinmadi</button>`
+            : (isOwner && ad.resolution === "resolved" ? `<div class="muted" style="width:100%; text-align:center;">Ish hal qilindi. Baho: ${ad.rating || "-"}/5</div>` : "");
+        return `
         <article class="worker-card premium-card" style="margin-bottom: 16px;">
             <div class="card-header">
                 <div class="worker-avatar">${avatarMarkup(ad.name || "E'lon", ad.avatar)}</div>
@@ -2071,12 +2124,14 @@ function renderAds() {
                 </div>
             </div>
             <div class="card-actions" style="margin-top: 16px; flex-wrap: wrap;">
-                <button class="btn-secondary" type="button" data-info="${ad.id}">Batafsil</button>
-                ${ad.booked ? `<button class="btn-secondary" type="button" disabled>Band qilingan</button>` : `<button class="btn-outline" type="button" data-book="${ad.id}">Band qilish</button>`}
-                <button class="btn-primary" type="button" data-chat="${ad.id}">Xabar berish</button>
+                <button class="btn-secondary" type="button" data-info="${adId}">Batafsil</button>
+                ${ad.booked ? `<button class="btn-secondary" type="button" disabled>Band qilingan</button>` : `<button class="btn-outline" type="button" data-book="${adId}">Band qilish</button>`}
+                <button class="btn-primary" type="button" data-chat="${adId}">Xabar berish</button>
+                ${ownerActions}
             </div>
         </article>
-    `).join("");
+    `;
+    }).join("");
 
     box.querySelectorAll("[data-info]").forEach((btn) => {
         btn.addEventListener("click", () => showAdSummary(btn.dataset.info));
@@ -2086,10 +2141,12 @@ function renderAds() {
     });
     box.querySelectorAll("[data-chat]").forEach((btn) => {
         btn.addEventListener("click", () => {
-            const ad = state.myAds.find((item) => String(item.id) === String(btn.dataset.chat));
+            const ad = state.myAds.find((item) => getAdId(item) === String(btn.dataset.chat));
             if (ad) openAdChat(ad);
         });
     });
+    box.querySelectorAll("[data-resolve]").forEach((btn) => btn.addEventListener("click", () => resolveAd(btn.dataset.resolve, "resolved")));
+    box.querySelectorAll("[data-unresolve]").forEach((btn) => btn.addEventListener("click", () => resolveAd(btn.dataset.unresolve, "unresolved")));
 }
 
 function switchTab(tab, options = {}) {
@@ -2144,6 +2201,14 @@ function renderProfile() {
     document.getElementById("loginCard")?.classList.toggle("hidden", !!p || state.authView !== "login");
     document.getElementById("registerCard")?.classList.toggle("hidden", !!p || state.authView !== "register");
     if (p) {
+        const ownRatings = (state.myAds || [])
+            .filter((ad) => String(ad.ownerId) === getCurrentUserId() && Number(ad.rating) > 0)
+            .map((ad) => Number(ad.rating));
+        const profileRating = document.getElementById("profileRatingSummary");
+        if (profileRating) {
+            const average = ownRatings.length ? (ownRatings.reduce((sum, value) => sum + value, 0) / ownRatings.length).toFixed(1) : "0.0";
+            profileRating.textContent = `Profil bahosi: ${average}/5 (${ownRatings.length} ta baho)`;
+        }
         const profileName = document.getElementById("profileName");
         const profilePhone = document.getElementById("profilePhone");
         if (profileName) profileName.textContent = p.fullName;
@@ -2159,6 +2224,8 @@ function renderProfile() {
                 : getInitials(p.fullName || "U");
         }
     } else {
+        const profileRating = document.getElementById("profileRatingSummary");
+        if (profileRating) profileRating.textContent = "";
         const preview = document.getElementById("profileAvatarPreview");
         if (preview) {
             preview.classList.remove("has-image");

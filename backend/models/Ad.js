@@ -16,7 +16,12 @@ const adSchema = new mongoose.Schema(
     avatar: { type: String, default: "" },
     booked: { type: Boolean, default: false },
     bookedBy: { type: String, default: null },
-    bookedAt: { type: Date, default: null }
+    bookedById: { type: String, default: null },
+    bookedAt: { type: Date, default: null },
+    resolution: { type: String, enum: ["pending", "resolved", "unresolved"], default: "pending" },
+    rating: { type: Number, min: 1, max: 5, default: null },
+    ratingComment: { type: String, default: "" },
+    ratedAt: { type: Date, default: null }
   },
   { timestamps: true }
 );
